@@ -27,5 +27,3 @@ while (acc === "0"){
         acc = next.value;
     }
 }
-
-}
