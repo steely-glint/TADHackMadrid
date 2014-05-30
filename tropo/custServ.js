@@ -8,7 +8,7 @@ if (from.indexOf("447")==0){
     ssay ("I see you are calling from a mobile phone.",vo);
     ssay ("I am now going to send you a link to our mobile web site.",vo);
     message("Click on https://gont.westhawk.co.uk/TADHackMadrid to register your damaged packet.", {to:from,network:"SMS",channel:"text"});
-    ssay ("If you hang up now and click the link from your android mobile phone we will be able to help you sooner.",vo);
+    ssay ("If you hang up now and click the link from your you-bun-too or android mobile phone we will be able to help you sooner.",vo);
     ssay ("If you would rather register the damaged packet over the phone, please wait.",vo);
 }
 var acc = "0";
