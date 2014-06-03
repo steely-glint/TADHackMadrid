@@ -1,182 +1,129 @@
 <!DOCTYPE html> 
 <html>
 
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<title>Multi-page template</title> 
-	<link rel="stylesheet" href="//code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
-	<script src="//code.jquery.com/jquery-1.7.1.min.js"></script>
-	<script src="//code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-</head>
-
-	
-<body> 
-
-<!-- Start of first page: #one -->
-<div data-role="page" id="manual">
-<script>
-    var gum = navigator.msGetUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia;
-    if (gum) {
-        console.log("Have GUM");
-        location.href = "#qrcode";
-        console.log("loading script");
-        $.getScript( "script/LazarQr.min.js", function() {
-                    console.log("loaded script");
-                    doQr();
-        });
-    }
-</script>
-	<div data-role="header">
-		<h1>Fragment</h1>
-	</div><!-- /header -->
-
-	<div data-role="content" >	
-		<h2>Parcel number</h2>
-
-        <p>
-        If you have received a damaged package, please fill in the
-        package number from the label in the area below.
-        </p>
-        <p>
-        <form>
-            <input type="text"></input>
-        </form>
-        </p>
-
-<!--
-		<h3>Show internal pages:</h3>
-		<p><a href="#two" data-role="button">Show page "two"</a></p>	
-		<p><a href="#popup" data-role="button" data-rel="dialog" data-transition="pop">Show page "popup" (as a dialog)</a></p> -->
-	</div><!-- /content -->
-	
-	<div data-role="footer" data-theme="d">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
-</div><!-- /page one -->
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"> 
+        <title>Fragment getQR</title> 
+        <link rel="stylesheet" href="//code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+        <script src="//code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="//code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+    </head>
 
 
-<!-- Start of second page: #two -->
-<div data-role="page" id="qrcode" data-theme="a">
+    <body> 
 
-	<div data-role="header">
-		<h1>Fragment</h1>
-	</div><!-- /header -->
+        <div data-role="page" id="manual">
+            <script>
+                var gum = navigator.msGetUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia;
+                $(document).ready(
+                        function() {
+                            if (gum) {
+                                console.log("Have GUM");
+                                console.log("loading script");
+                                $.getScript("script/LazarQr.min.js", function() {
+                                    console.log("loaded script");
+                                    doQr();
+                                });
+                            } else {
+                                location.href = "nogum.htm";
+                            }
+                        });
 
-	<div data-role="content" data-theme="a">	
-<script>
-    
-    function startQrDecode(){
-        var video = document.getElementById('gumVideo');
-        var photo = document.getElementById('qr-canvas');
-        var context = photo.getContext('2d');
-        // set our canvas to the same size as our video
-        qrcode.callback = function(code){
-            console.log("got qrcode of "+code);
-            clearInterval(tick);
-            navigator.vibrate(50);
-            $("#qrp").html(code);
-        };
+                function startQrDecode() {
+                    var video = document.getElementById('gumVideo');
+                    var photo = document.getElementById('qr-canvas');
+                    var context = photo.getContext('2d');
+                    // set our canvas to the same size as our video
+                    qrcode.callback = function(code) {
+                        console.log("got qrcode of " + code);
+                        clearInterval(tick);
+                        navigator.vibrate(50);
+                        location.href = "inspect.html?qrNo=" + code;
+                    };
 
-        var tick = setInterval(function() {
-            if ((video.videoWidth > 0) && (video.videoHeight >0)){
-                var rat = video.height / video.videoHeight  ;
-                photo.width = video.videoWidth  * rat ;
-                photo.height = video.videoHeight * rat;
-                console.log("set photo to "+ photo.width +" x " +photo.height);
-                console.log("rat was "+ rat);
-                context.drawImage(video, 0, 0, photo.width, photo.height);
-                qrcode.decode();
-            }
-        }, 250);
-    }
-    
-    function startGum(sid){
-        var constraints ={video: true,audio:false};
-        if (sid) {
-            constraints.video = {optional : [{sourceId: sid}]};
-        }
-        navigator.getUserMedia = (navigator.getUserMedia ||
-                                  navigator.webkitGetUserMedia ||
-                                  navigator.mozGetUserMedia ||
-                                  navigator.msGetUserMedia);
-        navigator.getUserMedia(constraints,
-          function(stream) {
-            var url = window.URL || window.webkitURL;
-            var v = document.getElementById('gumVideo');
-            v.src = url ? url.createObjectURL(stream) : stream;
-            v.play();
-            startQrDecode();
-          },
-          function(error) {
-            alert('Something went wrong. (error code ' + error.code + ')');
-            location.href = "#manual";
-            return;
-          }
-        );
-    }
-    
-    function onSourcesAcquired(sources) {
-        var sid;
-        for (var i = 0; i != sources.length; ++i) {
-            var source = sources[i];
-            console.log(source);
-            if ((source.kind == "video") && (source.facing == "environment")){
-                sid = source.id;
-                //break;
-            }
-            // source.id -> DEVICE ID
-            // source.label -> DEVICE NAME
-            // source.kind = "audio" OR "video"
-            // TODO: add this to some datastructure of yours or a selection dialog
-        }
-        startGum(sid);
-    }
+                    var tick = setInterval(function() {
+                        if ((video.videoWidth > 0) && (video.videoHeight > 0)) {
+                            var rat = video.height / video.videoHeight;
+                            photo.width = video.videoWidth * rat;
+                            photo.height = video.videoHeight * rat;
+                            console.log("set photo to " + photo.width + " x " + photo.height);
+                            console.log("rat was " + rat);
+                            context.drawImage(video, 0, 0, photo.width, photo.height);
+                            qrcode.decode();
+                        }
+                    }, 250);
+                }
 
-    function doQr(){
-        console.log("starting QR reader");
-        //frontcam...
-        var sid;
-        if ((typeof MediaStreamTrack === 'undefined') || (typeof MediaStreamTrack.getSources == 'undefined')){
-            startGum(sid);
-        } else {
-            MediaStreamTrack.getSources( onSourcesAcquired);
-        }
-    }
-    </script>
-<h2>QrCode</h2>
-		<p>We can use your mobile phone camera to get read the QrCode on the damaged package.</p>
-		<p><div id="qrp">
-            <canvas width="320" height="240" id="qr-canvas"></canvas>
-            <!--video width="320" height="240" id="gumVideo" autoplay="autoplay" /-->
-            <video style="display:none;" width="320" height="240" id="gumVideo" autoplay="autoplay" />
-        </div></p>
-		<p>If you would rather type in the package number, or the QrCode is unreadable then please use the manual process. <br/><a href="#manual" data-direction="reverse" data-role="button" data-theme="b">Manual process</a></p>
-		
-	</div><!-- /content -->
-	
-	<div data-role="footer">
-	</div><!-- /footer -->
-</div><!-- /page two -->
+                function startGum(sid) {
+                    var constraints = {video: true, audio: false};
+                    if (sid) {
+                        constraints.video = {optional: [{sourceId: sid}]};
+                    }
+                    navigator.getUserMedia = (navigator.getUserMedia ||
+                            navigator.webkitGetUserMedia ||
+                            navigator.mozGetUserMedia ||
+                            navigator.msGetUserMedia);
+                    navigator.getUserMedia(constraints,
+                            function(stream) {
+                                var url = window.URL || window.webkitURL;
+                                var v = document.getElementById('gumVideo');
+                                v.src = url ? url.createObjectURL(stream) : stream;
+                                v.play();
+                                startQrDecode();
+                            },
+                            function(error) {
+                                alert('Something went wrong. (error code ' + error.code + ')');
+                                location.href = "nogum.htm";
+                                return;
+                            }
+                    );
+                }
 
+                function onSourcesAcquired(sources) {
+                    var sid;
+                    for (var i = 0; i != sources.length; ++i) {
+                        var source = sources[i];
+                        console.log(source);
+                        if ((source.kind == "video") && (source.facing == "environment")) {
+                            sid = source.id;
+                            //break;
+                        }
+                        // source.id -> DEVICE ID
+                        // source.label -> DEVICE NAME
+                        // source.kind = "audio" OR "video"
+                        // TODO: add this to some datastructure of yours or a selection dialog
+                    }
+                    startGum(sid);
+                }
 
-<!-- Start of third page: #popup -->
-<div data-role="page" id="popup">
+                function doQr() {
+                    console.log("starting QR reader");
+                    //frontcam...
+                    var sid;
+                    if ((typeof MediaStreamTrack === 'undefined') || (typeof MediaStreamTrack.getSources == 'undefined')) {
+                        startGum(sid);
+                    } else {
+                        MediaStreamTrack.getSources(onSourcesAcquired);
+                    }
+                }
+            </script>
+            <h2>QrCode</h2>
+            <p>We can use your mobile phone camera to read the QrCode on the damaged package.</p>
+            <p>Hold your phone so that the Qrcode image is square, sharp and fully visible in the area below.</p>
+            <p><div id="qrp">
+                <canvas width="320" height="240" id="qr-canvas"></canvas>
+                <!--video width="320" height="240" id="gumVideo" autoplay="autoplay" /-->
+                <video style="display:none;" width="320" height="240" id="gumVideo" autoplay="autoplay" />
+            </div></p>
+        <p>If you would rather type in the package number, or the QrCode is unreadable then please use the manual process. <br/><a href="#manual" data-direction="reverse" data-role="button" data-theme="b">Manual process</a></p>
 
-	<div data-role="header" data-theme="e">
-		<h1>Dialog</h1>
-	</div><!-- /header -->
+    </div><!-- /content -->
 
-	<div data-role="content" data-theme="d">	
-		<h2>Popup</h2>
-		<p>I have an id of "popup" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
-		<p><a href="#one" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "one"</a></p>	
-	</div><!-- /content -->
-	
-	<div data-role="footer">
-		<h4>Page Footer</h4>
-	</div><!-- /footer -->
-</div><!-- /page popup -->
+    <div data-role="footer">
+    </div><!-- /footer -->
+</div>
+
 
 </body>
 </html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html> 
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"> 
+        <title>Fragment Show and tell</title> 
+        <link rel="stylesheet" href="//code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+        <script src="//code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="//code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+        <script src="script/jquery.phono.js"></script>
+        <script src="script/dophono.js"></script>
+
+    </head>
+
+
+    <body> 
+
+        <div data-role="page">
+            <h2>Damage inspection</h2>
+            <p>We can use your mobile phone camera to allow a customer service agent to see the damage.</p>
+            <p>An agent will join you shortly, please follow their instructions.</p>
+            <p>
+            <div id="qrp">
+                <div id="remote"><a href="rma.html" data-direction="reverse" data-role="button" data-theme="b">hangup.htm</a>
+                    <video width="10%" height="10%" id="yourVideo" autoplay="autoplay" muted="true"/>
+                </div>
+                <div id="local">
+                    <video width="75%" height="50%" id="myVideo" autoplay="autoplay" muted="true"/>
+                </div>
+            </div>
+        </p>
+        <p>If you would rather not allow an agent to see the package, please return it as instructed  <br/>
+            <a href="rma.html" data-direction="reverse" data-role="button" data-theme="b">RMA</a></p>
+
+    </div><!-- /content -->
+
+    <div data-role="footer">
+    </div><!-- /footer -->
+</div>
+
+
+</body>
+</html>
