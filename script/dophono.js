@@ -16,9 +16,11 @@ var far;
 var gum = navigator.msGetUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia || navigator.getUserMedia;
 $(document).ready(function() {
     if (gum) {
+        ga('send', 'event', 'GUM', 'available', {'page': '/inspect.html'});
         console.log("have gum");
         findEnvCam();
     } else {
+        ga('send', 'event', 'GUM', 'unavailable', {'page': '/inspect.html'});
         location.href = "rma.htm";
     }
 });
@@ -57,11 +59,13 @@ function doPhono() {
                 apiKey: apiKey,
                 audio: audio,
                 onReady: function() {
+                    ga('send', 'event', 'Phono', 'loaded', {'page': '/inspect.html'});
                     $.ajax({
                         url: "/bm2012/getJid.groovy?name=called"
                     }).done(
                             function(data) {
                                 far = data;
+                                ga('send', 'event', 'Phono', 'gotAgent', {'page': '/inspect.html'});
                                 call = phono.phone.dial("xmpp:" + far);
                             });
                 }

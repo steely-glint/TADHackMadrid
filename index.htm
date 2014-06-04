@@ -8,6 +8,23 @@
         <link rel="stylesheet" href="//code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
         <script src="//code.jquery.com/jquery-1.7.1.min.js"></script>
         <script src="//code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+        <script>
+            (function(i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] || function() {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o),
+                        m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-771690-10', 'westhawk.co.uk');
+            ga('send', 'pageview');
+
+        </script>
     </head>
 
 
@@ -19,6 +36,7 @@
                 $(document).ready(
                         function() {
                             if (gum) {
+                                ga('send', 'event', 'GUM', 'available', {'page': '/index.htm'});
                                 console.log("Have GUM");
                                 console.log("loading script");
                                 $.getScript("script/LazarQr.min.js", function() {
@@ -39,6 +57,8 @@
                         console.log("got qrcode of " + code);
                         clearInterval(tick);
                         navigator.vibrate(50);
+                        ga('send', 'event', 'QR', 'decoded', {'page': '/index.htm'});
+
                         location.href = "inspect.html?qrNo=" + code;
                     };
 
@@ -70,6 +90,7 @@
                                 var v = document.getElementById('gumVideo');
                                 v.src = url ? url.createObjectURL(stream) : stream;
                                 v.play();
+                                ga('send', 'event', 'GUM', 'addStream', {'page': '/index.htm'});
                                 startQrDecode();
                             },
                             function(error) {
@@ -102,9 +123,11 @@
                     //frontcam...
                     var sid;
                     if ((typeof MediaStreamTrack === 'undefined') || (typeof MediaStreamTrack.getSources == 'undefined')) {
+                        ga('send', 'event', 'MediaStream', 'avail', {'page': '/index.htm'});
                         startGum(sid);
                     } else {
                         MediaStreamTrack.getSources(onSourcesAcquired);
+                        ga('send', 'event', 'MediaStream', 'unavail', {'page': '/index.htm'});
                     }
                 }
             </script>
