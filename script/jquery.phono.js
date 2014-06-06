@@ -5107,6 +5107,7 @@ JSEPAudio.prototype.transport = function(config) {
                     return ldesc;
                 },
                 xlbw: function(ldesc) {
+                    // not clear this is correct....
                     var sdpLines = ldesc.sdp.split('\r\n');
                     // set opus to low bw
                     for (var i = 0; i < sdpLines.length; i++) {
@@ -5132,7 +5133,8 @@ JSEPAudio.prototype.transport = function(config) {
                     for (var i = 0; i < sdpLines.length; i++) {
                         if (sdpLines[i].search("a=mid:video") == 0) {
                             var line = "b=AS:256" ;
-                            sdpLines.splice(i, 0, [line]);
+                            i++;
+                            sdpLines.splice(i, 0, line);
                         }
                     }
                     return {
@@ -5411,7 +5413,13 @@ JSEPAudio.prototype.createContainer = function(haveVideo) {
             params: attribute.substring(attribute.indexOf(":")+1).split(" ")
         }
     }
-
+    _parseB = function(attribute) {
+        var s1 = attribute.split(":");
+        return {
+            rule: s1[0],
+            val: s1[1]
+        }
+    }
     _parseM = function(media) {
         var s1 = media.split(" ");
         return {
@@ -5705,6 +5713,9 @@ JSEPAudio.prototype.createContainer = function(haveVideo) {
         if (sdpObj.mid) {
             sdp = sdp + "a=mid:" + sdpObj.mid + "\r\n";
         }
+        if (sdpObj.maxbw){
+            sdp = sdp + "b=AS:" + sdpObj.maxbw + "\r\n";
+        }
 
         /*if (sdpObj.rtcp) {
             sdp = sdp + "a=rtcp:" + sdpObj.rtcp.port + " " + sdpObj.rtcp.nettype + " " + 
@@ -5862,10 +5873,15 @@ JSEPAudio.prototype.createContainer = function(haveVideo) {
                 // Ice candidates
                 var transp = {xmlns:"urn:xmpp:jingle:transports:ice-udp:1",
                              pwd: iceObj.pwd,
-                             ufrag: iceObj.ufrag};
+                             ufrag: iceObj.ufrag
+                             };
+                if (sdpObj.maxbw){
+                    transp.maxbw = sdpObj.maxbw;
+                } 
                 if (iceObj.options) {
                     transp.options = iceObj.options;
                 }
+                // add b=  here
 	        c = c.c('transport',transp);
                 var ccnt = 1;
                 Phono.util.each(sdpObj.candidates, function() {
@@ -6000,6 +6016,9 @@ JSEPAudio.prototype.createContainer = function(haveVideo) {
                     if ($(this).attr('xmlns') == "urn:xmpp:jingle:transports:ice-udp:1") {
                         sdpObj.ice.pwd = $(this).attr('pwd');
                         sdpObj.ice.ufrag = $(this).attr('ufrag');
+                        if ($(this).attr('maxbw')){
+                            sdpObj.maxbw = $(this).attr('maxbw');   
+                        }
                         if ($(this).attr('options')) {
                             sdpObj.ice.options = $(this).attr('options');
                         }
@@ -6059,6 +6078,14 @@ JSEPAudio.prototype.createContainer = function(haveVideo) {
                         sdpObj.connection = _parseC(line.contents);
                     } else {
                         contentsObj.connection = _parseC(line.contents);
+                    }
+                }
+                if (line.type == "b") {
+                    var b = _parseB(line.contents);
+                    Phono.log.debug("got B line "+b.rule+" = "+b.val);
+                    if (b.rule == "AS"){
+                        sdpObj.maxbw = b.val;
+                        Phono.log.debug("setting maxbw to "+b.val);
                     }
                 }
                 if (line.type == "a") {

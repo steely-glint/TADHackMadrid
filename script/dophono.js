@@ -6,7 +6,7 @@ var iceServers = [
 ];
 var audio = {
     media: {audio: true, video: true},
-    // localSettings: "lbv",
+    localSettings: "lbv",
     localContainerId: "myVideo",
     remoteContainerId: "yourVideo",
     iceServers: iceServers
@@ -59,6 +59,7 @@ function doPhono() {
                 apiKey: apiKey,
                 audio: audio,
                 onReady: function() {
+                    phono.setLogLevel("DEBUG");
                     ga('send', 'event', 'Phono', 'loaded', {'page': '/inspect.html'});
                     $.ajax({
                         url: "/bm2012/getJid.groovy?name=called"

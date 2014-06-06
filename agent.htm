@@ -4,7 +4,8 @@
     <script src="script/jquery.phono.js"></script>
 </head>
 <body>
-	<div> Some snippets of javascript to demo phono</div>
+	<div> Mock agent screen </div>
+        <div id="status">loading...</div>
 	<div id="remote">
 		<video width="75%" height="75%" id="yourVideo" autoplay="autoplay" />
 	</div>
@@ -19,11 +20,13 @@ var call;
 var apiKey="C17D167F-09C6-4E4C-A3DD-2025D48BA243";
 var phone = {onIncomingCall:function (evt) { 
 	call=evt.call;
+        $("#status").html("called");
+
 	setTimeout(function(){call.answer()},5000);
    }
 };
 var videocons ={ "mandatory": { "maxWidth": "400"} };
-var audio = {media:{audio:true,video:true},localContainerId:"myVideo",remoteContainerId:"yourVideo"};//,localSettings: "lbv"};
+var audio = {media:{audio:true,video:true},localContainerId:"myVideo",remoteContainerId:"yourVideo",localSettings: "lbv"};
 var phono;
 var far;
 $(document).ready(
@@ -33,6 +36,8 @@ $(document).ready(
 	     apiKey:apiKey,
 	     audio:audio,phone:phone,
              onReady:function(){
+                 $("#status").html("ready");
+                  phono.setLogLevel("DEBUG");
 		  $.ajax(
 		   {
                     url:"/bm2012/setJid.groovy?name=called&jid="+phono.sessionId}).done(function(data){far = data});
